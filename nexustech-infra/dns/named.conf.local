@@ -1,0 +1,23 @@
+options {
+
+    directory "/var/cache/bind";
+
+    recursion yes;
+
+    allow-query { any; };
+
+    allow-recursion { any; };
+
+    listen-on { any; };
+
+    listen-on-v6 { none; };
+};
+
+zone "nexustech.com.br" {
+
+    type master;
+
+    file "/etc/bind/nexustech.com.br";
+
+    allow-transfer { 127.0.0.1; };
+};

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusTech Solutions</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+        }
+
+        header{
+            background: #111827;
+            padding: 20px 50px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border-bottom: 2px solid #00d084;
+        }
+
+        header h1{
+            color:#00d084;
+        }
+
+        nav a{
+            color:white;
+            text-decoration:none;
+            margin-left:20px;
+            transition:0.3s;
+        }
+
+        nav a:hover{
+            color:#00d084;
+        }
+
+        .hero{
+            height:80vh;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            text-align:center;
+            padding:20px;
+        }
+
+        .hero h2{
+            font-size:4rem;
+            margin-bottom:20px;
+        }
+
+        .hero p{
+            font-size:1.3rem;
+            max-width:700px;
+            color:#cbd5e1;
+        }
+
+        .btn{
+            margin-top:30px;
+            padding:15px 30px;
+            background:#00d084;
+            color:black;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:bold;
+            transition:0.3s;
+        }
+
+        .btn:hover{
+            background:#00ffae;
+        }
+
+        .services{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            gap:20px;
+            padding:60px;
+        }
+
+        .card{
+            background:#1e293b;
+            padding:30px;
+            border-radius:12px;
+            border:1px solid #334155;
+        }
+
+        .card h3{
+            color:#00d084;
+            margin-bottom:15px;
+        }
+
+        footer{
+            text-align:center;
+            padding:20px;
+            background:#111827;
+            color:#94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>NexusTech</h1>
+
+        <nav>
+            <a href="#">Início</a>
+            <a href="#">Serviços</a>
+            <a href="#">Infraestrutura</a>
+            <a href="#">Contato</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h2>Infraestrutura Inteligente para Empresas</h2>
+
+        <p>
+            Soluções modernas em servidores web, DNS corporativo,
+            serviços de e-mail e infraestrutura em containers.
+        </p>
+
+        <a href="#" class="btn">Conheça nossos serviços</a>
+    </section>
+
+    <section class="services">
+
+        <div class="card">
+            <h3>🌐 DNS Corporativo</h3>
+            <p>
+                Gerenciamento seguro e escalável de domínios empresariais.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>📧 E-mail Empresarial</h3>
+            <p>
+                Hospedagem de e-mails corporativos com alta disponibilidade.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>☁️ Infraestrutura Docker</h3>
+            <p>
+                Ambientes modernos utilizando containers e virtualização.
+            </p>
+        </div>
+
+    </section>
+
+    <footer>
+        © 2026 NexusTech Solutions - Todos os direitos reservados.
+    </footer>
+
+</body>
+</html>

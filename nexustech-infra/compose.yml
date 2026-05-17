@@ -1,0 +1,64 @@
+services:
+  web-asa01:
+    build:
+      context: ./c001-web-asa01
+      dockerfile: Dockerfile
+    image: web-asa01
+    container_name: c001-web-asa
+    ports:
+      - "80:80"
+    volumes:
+      - ./c001-web-asa01:/usr/share/nginx/html
+      - ./c001-web-asa01/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - asa-network
+
+  web-asa02:
+    build:
+      context: ./c002-web-asa02
+      dockerfile: Dockerfile
+    image: web-asa02
+    container_name: c002-web-asa
+    ports:
+      - "81:80"
+    volumes:
+      - ./c002-web-asa02:/usr/share/nginx/html 
+      - ./c002-web-asa02/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - asa-network
+
+  web-asa03:
+    build:
+      context: ./c003-web-asa03
+      dockerfile: Dockerfile
+    image: web-asa03
+    container_name: c003-web-asa
+    ports:
+      - "82:80"
+    volumes:
+      - ./c003-web-asa03:/usr/share/nginx/html 
+      - ./c003-web-asa03/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - asa-network
+
+  dns-server:
+    build: 
+      context: ./d001-dns-server
+      dockerfile: Dockerfile
+    image: dns-server-asa
+    container_name: d001-dns-server
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+    volumes:
+      - ./d001-dns-server/named.conf.local:/etc/bind/named.conf.local
+      - ./d001-dns-server/jc.asa.br:/etc/bind/jc.asa.br
+    networks:
+      - asa-network
+    restart: always
+
+
+
+networks:
+  asa-network:
+    driver: bridge
