@@ -1,67 +1,33 @@
-# See /usr/share/postfix/main.cf.dist for a commented, more complete version
-
 compatibility_level = 3.9
 
-# Domínio principal do servidor
+myhostname = mail.nexustech.com.br
 myorigin = nexustech.com.br
-
-# Banner SMTP
 smtpd_banner = $myhostname ESMTP $mail_name (NexusTech Mail Server)
 
-# Protocolos utilizados
 inet_protocols = ipv4
-
-# Redes confiáveis
 mynetworks_style = subnet
+mynetworks = 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
 
-mynetworks = 127.0.0.0/8, 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12
-
-# Domínios locais aceitos pelo servidor
-mydestination = localhost, localhost.localdomain, nexustech.com.br
-
-# Limite da caixa postal
+mydestination = localhost, localhost.localdomain, nexustech.com.br, mail.nexustech.com.br
+home_mailbox = Maildir/
 mailbox_size_limit = 0
-
-# Método de entrega
 mailbox_command =
 
-# Aliases
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 
-# Notificações locais
 biff = no
-
-# Separador de extensões de usuário
 recipient_delimiter = +
-
-# Relay externo
 relayhost =
 
-# Caminho SASL
 cyrus_sasl_config_path = /etc/postfix/sasl
 
-# TLS SMTP
 smtpd_tls_key_file = /etc/ssl/private/ssl-cert-snakeoil.key
 smtpd_tls_cert_file = /etc/ssl/certs/ssl-cert-snakeoil.pem
-
-# Segurança TLS
 smtpd_tls_security_level = may
-
-# Certificados CA
 smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
-
-# TLS de saída
 smtp_tls_security_level = may
-
-# Cache TLS
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 
-# Restrições de relay
 smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
-
-# Hostname do servidor
-myhostname = mail.nexustech.com.br
-
-# Interfaces
 inet_interfaces = all

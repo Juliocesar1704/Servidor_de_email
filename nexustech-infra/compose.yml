@@ -1,64 +1,89 @@
 services:
-  web-asa01:
-    build:
-      context: ./c001-web-asa01
-      dockerfile: Dockerfile
-    image: web-asa01
-    container_name: c001-web-asa
-    ports:
-      - "80:80"
-    volumes:
-      - ./c001-web-asa01:/usr/share/nginx/html
-      - ./c001-web-asa01/default.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - asa-network
 
-  web-asa02:
+  # --- PROXY REVERSO DEDICADO ---
+  proxy-server:
     build:
-      context: ./c002-web-asa02
+      context: ./proxy
       dockerfile: Dockerfile
-    image: web-asa02
-    container_name: c002-web-asa
+    image: nexustech-proxy
+    container_name: p001-proxy-server
     ports:
-      - "81:80"
-    volumes:
-      - ./c002-web-asa02:/usr/share/nginx/html 
-      - ./c002-web-asa02/default.conf:/etc/nginx/conf.d/default.conf
+      - "80:80"  # Expondo apenas a porta 80 para acesso externo
     networks:
-      - asa-network
+      - nexustech-network
+    restart: always
+    depends_on:
+      - web-main
+      - web-portal
+      - web-support
 
-  web-asa03:
+  # --- SITE PRINCIPAL ---
+  web-main:
     build:
-      context: ./c003-web-asa03
+      context: ./web/site-main
       dockerfile: Dockerfile
-    image: web-asa03
-    container_name: c003-web-asa
-    ports:
-      - "82:80"
-    volumes:
-      - ./c003-web-asa03:/usr/share/nginx/html 
-      - ./c003-web-asa03/default.conf:/etc/nginx/conf.d/default.conf
+    image: nexustech-web-main
+    container_name: c001-web-main
     networks:
-      - asa-network
+      - nexustech-network
+    restart: always
 
+  # --- PORTAL ---
+  web-portal:
+    build:
+      context: ./web/site-portal
+      dockerfile: Dockerfile
+    image: nexustech-web-portal
+    container_name: c002-web-portal
+    networks:
+      - nexustech-network
+    restart: always
+
+  # --- SUPORTE ---
+  web-support:
+    build:
+      context: ./web/site-support
+      dockerfile: Dockerfile
+    image: nexustech-web-support
+    container_name: c003-web-support
+    networks:
+      - nexustech-network
+    restart: always
+
+  # --- SERVIÇO DE DNS (BIND9) ---
   dns-server:
     build: 
-      context: ./d001-dns-server
+      context: ./dns
       dockerfile: Dockerfile
-    image: dns-server-asa
+    image: nexustech-dns
     container_name: d001-dns-server
     ports:
       - "53:53/udp"
       - "53:53/tcp"
     volumes:
-      - ./d001-dns-server/named.conf.local:/etc/bind/named.conf.local
-      - ./d001-dns-server/jc.asa.br:/etc/bind/jc.asa.br
+      - ./dns/named.conf.local:/etc/bind/named.conf.local
+      - ./dns/nexustech.com.br:/etc/bind/nexustech.com.br
     networks:
-      - asa-network
+      - nexustech-network
     restart: always
 
-
+  # --- SERVIÇO DE E-MAIL (POSTFIX + DOVECOT) ---
+  mail-server:
+    build:
+      context: ./mail
+      dockerfile: Dockerfile
+    image: nexustech-mail
+    container_name: m001-mail-server
+    ports:
+      - "25:25"   # SMTP
+      - "143:143" # IMAP
+      - "110:110" # POP3
+    volumes:
+      - ./mail_data:/var/mail/vmail
+    networks:
+      - nexustech-network
+    restart: always
 
 networks:
-  asa-network:
+  nexustech-network:
     driver: bridge
