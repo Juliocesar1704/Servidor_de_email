@@ -1,42 +1,98 @@
 FROM ubuntu:22.04
 
-# Evita que o instalador do Ubuntu fique travado fazendo perguntas na tela
+# Evita perguntas interativas durante instalação
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Atualização do sistema e instalação dos serviços essenciais
+# Atualização e instalação dos serviços
 RUN apt update -y && apt upgrade -y && \
-    apt install -y postfix dovecot-imapd dovecot-pop3d dovecot-lmtpd \
-    telnet nano syslog-ng procps net-tools && \
+    apt install -y \
+    postfix \
+    dovecot-imapd \
+    dovecot-pop3d \
+    dovecot-lmtpd \
+    telnet \
+    nano \
+    syslog-ng \
+    procps \
+    net-tools && \
     apt clean
 
-# Copiando as configurações do Postfix e o Mailname
+# --------------------------------------------------
+# POSTFIX
+# --------------------------------------------------
+
 COPY ./postfix/ /etc/postfix/
 COPY mailname /etc/mailname
 
-# Remove apenas os arquivos .conf padrões do Ubuntu para não chocar com os novos arquivos de configuração do Dovecot
+# Corrige permissões do Postfix
+RUN chmod 644 /etc/postfix/main.cf && \
+    chown root:root /etc/postfix/main.cf
+
+# --------------------------------------------------
+# DOVECOT
+# --------------------------------------------------
+
+# Remove configs padrão
 RUN rm -f /etc/dovecot/conf.d/*.conf
+
+# Copia configs personalizadas
 COPY ./dovecot/ /etc/dovecot/conf.d/
 
-# --- CORREÇÕES DE SINTAXE GARANTIDAS ---
-RUN sed -i 's/disable_plaintext_auth.*/disable_plaintext_auth = no/g' /etc/dovecot/conf.d/10-auth.conf || true
+# --------------------------------------------------
+# SCRIPT DE USUÁRIOS
+# --------------------------------------------------
 
-# Copiando o script de usuários para uma pasta de execução
 COPY mail.sh /usr/local/bin/mail.sh
+
 RUN chmod +x /usr/local/bin/mail.sh
 
-# Estrutura esqueleto para garantir que todo novo usuário criado já nasça com a pasta de e-mails pronta
-RUN mkdir -p /etc/skel/Maildir/{cur,new,tmp} && chmod -R 700 /etc/skel/Maildir
+# --------------------------------------------------
+# ESTRUTURA PADRÃO DOS E-MAILS
+# --------------------------------------------------
 
-# Portas 
+# Todo novo usuário já nasce com Maildir
+RUN mkdir -p /etc/skel/Maildir/{cur,new,tmp}
+
+# Permissões do Maildir
+RUN chmod -R 700 /etc/skel/Maildir
+
+# --------------------------------------------------
+# PORTAS
+# --------------------------------------------------
+
+# SMTP
 EXPOSE 25/tcp
+
+# SUBMISSION
 EXPOSE 587/tcp
+
+# POP3
 EXPOSE 110/tcp
+
+# IMAP
 EXPOSE 143/tcp
+
+# IMAPS
 EXPOSE 993/tcp
+
+# POP3S
 EXPOSE 995/tcp
 
-# Área de persistência
-VOLUME ["/var/mail/vmail"]
+# --------------------------------------------------
+# PERSISTÊNCIA
+# --------------------------------------------------
 
-# Inicialização dos serviços
-CMD ["sh", "-c", "/usr/local/bin/mail.sh ; service syslog-ng start ; service postfix start ; service dovecot start ; tail -F /var/log/mail.log"]
+# Salva usuários e e-mails fora do container
+VOLUME ["/home"]
+
+# --------------------------------------------------
+# INICIALIZAÇÃO
+# --------------------------------------------------
+
+CMD ["sh", "-c", "\
+/usr/local/bin/mail.sh && \
+service syslog-ng start && \
+service postfix start && \
+service dovecot start && \
+tail -F /var/log/mail.log \
+"]

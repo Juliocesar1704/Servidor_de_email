@@ -8,14 +8,14 @@ services:
     image: nexustech-proxy
     container_name: p001-proxy-server
     ports:
-      - "80:80"  # Expondo apenas a porta 80 para acesso externo
+      - "80:80"
     networks:
       - nexustech-network
     restart: always
     depends_on:
       - web-main
       - web-portal
-      - web-support
+      - web-suporte
 
   # --- SITE PRINCIPAL ---
   web-main:
@@ -40,19 +40,19 @@ services:
     restart: always
 
   # --- SUPORTE ---
-  web-support:
+  web-suporte:
     build:
-      context: ./web/site-support
+      context: ./web/site-suporte
       dockerfile: Dockerfile
-    image: nexustech-web-support
-    container_name: c003-web-support
+    image: nexustech-web-suporte
+    container_name: c003-web-suporte
     networks:
       - nexustech-network
     restart: always
 
   # --- SERVIÇO DE DNS (BIND9) ---
   dns-server:
-    build: 
+    build:
       context: ./dns
       dockerfile: Dockerfile
     image: nexustech-dns
@@ -75,11 +75,14 @@ services:
     image: nexustech-mail
     container_name: m001-mail-server
     ports:
-      - "25:25"   # SMTP
-      - "143:143" # IMAP
-      - "110:110" # POP3
+      - "25:25"
+      - "587:587"
+      - "143:143"
+      - "993:993"
+      - "110:110"
+      - "995:995"
     volumes:
-      - ./mail_data:/var/mail/vmail
+      - mail_data:/home
     networks:
       - nexustech-network
     restart: always
@@ -87,3 +90,6 @@ services:
 networks:
   nexustech-network:
     driver: bridge
+
+volumes:
+  mail_data:

@@ -18,7 +18,7 @@ ns      IN  A       10.24.6.54
 
 www     IN  A       10.24.6.54
 portal  IN  A       10.24.6.55
-support IN  A       10.24.6.56
+suporte IN  A       10.24.6.56
 
 mail    IN  A       10.24.6.57
 

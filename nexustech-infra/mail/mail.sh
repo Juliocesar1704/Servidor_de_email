@@ -1,26 +1,47 @@
 #!/bin/bash
 
-# Criando a pasta raiz onde todos os e-mails ficarão centralizados para persistência
-mkdir -p /var/mail/vmail
+# --------------------------------------------------
+# FUNÇÃO RESPONSÁVEL POR CRIAR USUÁRIOS DE E-MAIL
+# --------------------------------------------------
 
-# Função em bloco para criar o usuário apenas se ele não existir no sistema
 criar_usuario() {
-    local user=$1
-    local name=$2
-    if ! id "$user" &>/dev/null; then
-        # Define a home do usuário dentro da pasta que será persistida
-        # Adicionado "|| true" para ignorar se o Linux reclamar do chown automático do useradd no volume
-        useradd -c "$name" -d /var/mail/vmail/$user -m -s /bin/false "$user" || true
-        echo "$user:123456" | chpasswd
+
+    # Recebe o nome do usuário passado na chamada da função
+    usuario=$1
+
+    # Verifica se o usuário já existe no sistema
+    # Isso evita erro ao reiniciar o container
+    if ! id "$usuario" &>/dev/null; then
+
+        # Cria o usuário:
+        # --disabled-password -> não pede senha interativa
+        # --gecos "" -> evita perguntas adicionais
+        adduser --disabled-password --gecos "" "$usuario"
+
+        # Define a senha padrão do usuário
+        echo "$usuario:123456" | chpasswd
+
+        # Cria a estrutura Maildir utilizada pelo Dovecot/Postfix
+        mkdir -p /home/$usuario/Maildir
+
+        # Define o usuário como dono da própria pasta
+        chown -R $usuario:$usuario /home/$usuario
+
+        # Permissão da home:
+        # somente o próprio usuário pode acessar
+        chmod 700 /home/$usuario
+
+        # Permissões da caixa de e-mail
+        chmod -R 700 /home/$usuario/Maildir
+
     fi
 }
 
-# Criando as contas solicitadas passando os parâmetros para o bloco
-criar_usuario "admin_nx" "admin_nx"
-criar_usuario "suporte_nx" "suporte_nx"
-criar_usuario "financeiro_nx" "financeiro_nx"
-criar_usuario "contato_nx" "contato_nx"
+# --------------------------------------------------
+# CRIAÇÃO DAS CONTAS DE E-MAIL
+# --------------------------------------------------
 
-# Ajustando permissões - Adicionado "|| true" no final de cada uma para o Docker Desktop não travar o script
-chown -R mail:mail /var/mail/vmail || true
-chmod -R 770 /var/mail/vmail || true
+criar_usuario admin_nx
+criar_usuario suporte_nx
+criar_usuario financeiro_nx
+criar_usuario contato_nx
