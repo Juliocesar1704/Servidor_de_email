@@ -203,5 +203,5 @@ Garantindo:
 
 # 👨‍💻 Autor
 
-*Julio Cesar*
+*Júlio César*
 Projeto acadêmico de Infraestrutura Corporativa utilizando Docker Compose.
